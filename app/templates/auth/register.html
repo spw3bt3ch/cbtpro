@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}Register{% endblock %}
+{% block content %}
+<div class="max-w-md mx-auto bg-white p-6 rounded border">
+	<h1 class="text-2xl font-semibold mb-4">Create Account</h1>
+	<form method="post">
+		{{ form.hidden_tag() }}
+		<div class="space-y-4">
+			<div>
+				<label class="block text-sm mb-1">Full Name</label>
+				{{ form.full_name(class_='w-full border rounded px-3 py-2') }}
+			</div>
+			<div>
+				<label class="block text-sm mb-1">Email</label>
+				{{ form.email(class_='w-full border rounded px-3 py-2') }}
+			</div>
+			<div class="grid grid-cols-2 gap-3">
+				<div>
+					<label class="block text-sm mb-1">Password</label>
+					{{ form.password(class_='w-full border rounded px-3 py-2') }}
+				</div>
+				<div>
+					<label class="block text-sm mb-1">Confirm</label>
+					{{ form.confirm(class_='w-full border rounded px-3 py-2') }}
+				</div>
+			</div>
+			<div>
+				<label class="block text-sm mb-1">Role</label>
+				{{ form.role(class_='w-full border rounded px-3 py-2') }}
+			</div>
+			<div>
+				<label class="block text-sm mb-1">Class</label>
+				{{ form.class_name(class_='w-full border rounded px-3 py-2') }}
+				<p class="text-xs text-gray-500">Use Basic 1–9 for modern Nigeria classes. Leave blank to see all subjects.</p>
+			</div>
+			<button class="w-full bg-brand text-white rounded py-2">Create Account</button>
+		</div>
+	</form>
+	<p class="text-sm text-center mt-4">Have an account? <a class="text-brand" href="{{ url_for('auth.login') }}">Login</a></p>
+</div>
+{% endblock %}

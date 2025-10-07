@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>{% block title %}CBT App{% endblock %}</title>
+	<script src="https://cdn.tailwindcss.com"></script>
+	<script>
+		tailwind.config = {
+			darkMode: 'class',
+			theme: {
+				extend: {
+					colors: {
+						brand: {
+							DEFAULT: '#0ea5e9',
+							dark: '#0284c7'
+						}
+					}
+				}
+			}
+		}
+	</script>
+	<script>
+		(function() {
+			try {
+				const stored = localStorage.getItem('theme');
+				const preferDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+				if (stored === 'dark' || (!stored && preferDark)) {
+					document.documentElement.classList.add('dark');
+				}
+			} catch (e) {}
+		})();
+	</script>
+</head>
+<body class="min-h-screen bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100">
+	<header class="bg-white/80 dark:bg-gray-900/80 backdrop-blur border-b border-gray-200 dark:border-gray-800 sticky top-0 z-40">
+		<div class="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+			<a href="{{ url_for('main.home') }}" class="font-semibold text-lg">CBT<span class="text-brand">Pro</span></a>
+			<nav class="hidden sm:flex items-center gap-6">
+				<a class="hover:text-brand" href="{{ url_for('main.home') }}">Home</a>
+				<a class="hover:text-brand" href="{{ url_for('student.index') }}">CBT</a>
+				<a class="hover:text-brand" href="{{ url_for('main.contact') }}">Contact</a>
+				{% if current_user.is_authenticated %}
+					<a class="hover:text-brand" href="{{ url_for('main.dashboard') }}">Dashboard</a>
+					<a class="text-red-600 dark:text-red-400" href="{{ url_for('auth.logout') }}">Logout</a>
+				{% else %}
+					<a class="text-brand" href="{{ url_for('auth.login') }}">Login</a>
+					<a class="text-white bg-brand px-3 py-1.5 rounded" href="{{ url_for('auth.register') }}">Sign up</a>
+				{% endif %}
+				<button id="theme-toggle" class="ml-2 p-2 rounded border border-gray-300 dark:border-gray-700 text-sm">
+					<!-- Moon icon (show in light mode) -->
+					<svg id="icon-moon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 118.646 3.646 7 7 0 0020.354 15.354z" />
+					</svg>
+					<!-- Sun icon (show in dark mode) -->
+					<svg id="icon-sun" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2m0 14v2m9-9h-2M5 12H3m15.364 6.364l-1.414-1.414M7.05 7.05L5.636 5.636m12.728 0l-1.414 1.414M7.05 16.95l-1.414 1.414M12 8a4 4 0 100 8 4 4 0 000-8z" />
+					</svg>
+				</button>
+			</nav>
+			<div class="sm:hidden flex items-center gap-3">
+				<button id="theme-toggle-sm" class="p-2 rounded border border-gray-300 dark:border-gray-700 text-sm">
+					<svg id="icon-moon-sm" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 118.646 3.646 7 7 0 0020.354 15.354z" />
+					</svg>
+					<svg id="icon-sun-sm" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2m0 14v2m9-9h-2M5 12H3m15.364 6.364l-1.414-1.414M7.05 7.05L5.636 5.636m12.728 0l-1.414 1.414M7.05 16.95l-1.414 1.414M12 8a4 4 0 100 8 4 4 0 000-8z" />
+					</svg>
+				</button>
+				<a href="{{ url_for('main.dashboard') }}" class="text-brand">Menu</a>
+			</div>
+		</div>
+	</header>
+	<main class="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+		{% with messages = get_flashed_messages(with_categories=true) %}
+			{% if messages %}
+				<div class="space-y-2 mb-6">
+					{% for category, message in messages %}
+						<div class="p-3 rounded border {{ 'border-red-300 bg-red-50 text-red-700' if category=='error' else 'border-emerald-300 bg-emerald-50 text-emerald-700' }}">{{ message }}</div>
+					{% endfor %}
+				</div>
+			{% endif %}
+		{% endwith %}
+		{% block content %}{% endblock %}
+	</main>
+	<footer class="border-t border-gray-200 dark:border-gray-800 py-8 text-center text-sm bg-white text-gray-600 dark:bg-gray-900 dark:text-gray-100">
+		<div class="max-w-6xl mx-auto px-4 sm:px-6">
+			<div>© {{ 2025 }} CBTPro. All rights reserved.</div>
+			<div class="mt-1">Developed by <span class="font-medium">SMI Solution</span>.</div>
+		</div>
+	</footer>
+	<script>
+		function setTheme(dark) {
+			try {
+				if (dark) {
+					document.documentElement.classList.add('dark');
+					localStorage.setItem('theme', 'dark');
+					document.getElementById('icon-sun')?.classList.remove('hidden');
+					document.getElementById('icon-moon')?.classList.add('hidden');
+					document.getElementById('icon-sun-sm')?.classList.remove('hidden');
+					document.getElementById('icon-moon-sm')?.classList.add('hidden');
+				} else {
+					document.documentElement.classList.remove('dark');
+					localStorage.setItem('theme', 'light');
+					document.getElementById('icon-sun')?.classList.add('hidden');
+					document.getElementById('icon-moon')?.classList.remove('hidden');
+					document.getElementById('icon-sun-sm')?.classList.add('hidden');
+					document.getElementById('icon-moon-sm')?.classList.remove('hidden');
+				}
+			} catch (e) {}
+		}
+		(function initThemeToggle(){
+			const isDark = document.documentElement.classList.contains('dark');
+			setTheme(isDark);
+			function toggle(){ setTheme(!document.documentElement.classList.contains('dark')); }
+			document.getElementById('theme-toggle')?.addEventListener('click', toggle);
+			document.getElementById('theme-toggle-sm')?.addEventListener('click', toggle);
+		})();
+	</script>
+</body>
+</html>

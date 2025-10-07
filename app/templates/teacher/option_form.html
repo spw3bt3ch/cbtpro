@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}New Option{% endblock %}
+{% block content %}
+<div class="max-w-lg bg-white p-6 rounded border">
+	<h1 class="text-2xl font-semibold mb-4">Add Option</h1>
+	<form method="post">
+		{{ form.hidden_tag() }}
+		<div class="space-y-4">
+			<div>
+				<label class="block text-sm mb-1">Text</label>
+				{{ form.text(class_='w-full border rounded px-3 py-2') }}
+			</div>
+			<div class="flex items-center gap-2">
+				{{ form.is_correct(class_='h-4 w-4') }}
+				<label>Mark as correct</label>
+			</div>
+			<button class="bg-brand text-white px-4 py-2 rounded">Add</button>
+		</div>
+	</form>
+</div>
+{% endblock %}

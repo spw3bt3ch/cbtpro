@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Settings{% endblock %}
+{% block content %}
+<div class="max-w-lg bg-white p-6 rounded border">
+	<h1 class="text-2xl font-semibold mb-4">Account Settings</h1>
+	<form method="post">
+		{{ form.hidden_tag() }}
+		<div class="space-y-4">
+			<div>
+				<label class="block text-sm mb-1">Class</label>
+				{{ form.class_name(class_='w-full border rounded px-3 py-2') }}
+				<p class="text-xs text-gray-500">Set your class to see relevant subjects.</p>
+			</div>
+			<button class="bg-brand text-white px-4 py-2 rounded">Save Settings</button>
+		</div>
+	</form>
+</div>
+{% endblock %}

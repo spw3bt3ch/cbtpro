@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}Subject Detail{% endblock %}
+{% block content %}
+<div class="mb-6 flex items-center justify-between">
+	<div>
+		<h1 class="text-2xl font-semibold">{{ subject.name }}</h1>
+		<p class="text-gray-600">Duration: {{ subject.duration_minutes }} minutes</p>
+	</div>
+	<div class="flex items-center gap-3">
+		<a class="px-3 py-2 rounded border" href="{{ url_for('teacher.edit_subject', subject_id=subject.id) }}">Edit Subject</a>
+		<form method="post" action="{{ url_for('teacher.delete_subject', subject_id=subject.id) }}">
+			{{ delete_form.hidden_tag() }}
+			<button class="px-3 py-2 rounded border border-red-300 text-red-600" onclick="return confirm('Delete subject and all questions/options?')">Delete</button>
+		</form>
+	</div>
+</div>
+<div class="mb-4">
+	<a class="bg-brand text-white px-4 py-2 rounded" href="{{ url_for('teacher.add_question', subject_id=subject.id) }}">Add Question</a>
+</div>
+<div class="space-y-4">
+	{% for q in subject.questions %}
+		<div class="bg-white border rounded p-4">
+			<div class="flex items-start justify-between gap-3">
+				<div class="font-semibold">Q{{ loop.index }}. {{ q.text }}</div>
+				<div class="flex items-center gap-3 text-sm">
+					<a class="text-gray-700" href="{{ url_for('teacher.edit_question', question_id=q.id) }}">Edit</a>
+					<form method="post" action="{{ url_for('teacher.delete_question', question_id=q.id) }}">
+						{{ delete_form.hidden_tag() }}
+						<button class="text-red-600" onclick="return confirm('Delete question?')">Delete</button>
+					</form>
+				</div>
+			</div>
+			<div class="mt-2 space-y-1">
+				{% for o in q.options %}
+					<div class="flex items-center justify-between text-sm {{ 'text-emerald-700' if o.is_correct else 'text-gray-700' }}">
+						<div>- {{ o.text }} {% if o.is_correct %}<span class="ml-2 text-emerald-600">(Correct)</span>{% endif %}</div>
+						<div class="flex items-center gap-3">
+							<a class="text-gray-700" href="{{ url_for('teacher.edit_option', option_id=o.id) }}">Edit</a>
+							<form method="post" action="{{ url_for('teacher.delete_option', option_id=o.id) }}">
+								{{ delete_form.hidden_tag() }}
+								<button class="text-red-600" onclick="return confirm('Delete option?')">Delete</button>
+							</form>
+						</div>
+					</div>
+				{% endfor %}
+			</div>
+			<div class="mt-3">
+				<a class="text-brand" href="{{ url_for('teacher.add_option', question_id=q.id) }}">Add Option</a>
+			</div>
+		</div>
+	{% else %}
+		<div class="text-gray-500">No questions yet.</div>
+	{% endfor %}
+</div>
+{% endblock %}

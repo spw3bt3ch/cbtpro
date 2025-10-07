@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+{% block title %}Take Exam - {{ subject.name }}{% endblock %}
+{% block content %}
+<div class="flex items-center justify-between mb-4">
+	<h1 class="text-2xl font-semibold">{{ subject.name }}</h1>
+	<div class="text-sm text-gray-600 flex items-center gap-3">
+		<div class="text-xs uppercase tracking-wide">Subject time</div>
+		<div class="text-xl font-mono"><span id="timer">--:--</span></div>
+	</div>
+</div>
+<div id="timeup-banner" class="hidden mb-4 p-3 rounded border border-red-300 bg-red-50 text-red-700">Time is up. Please click Submit to finish.</div>
+<form method="post" id="exam-form" class="space-y-6">
+	<input type="hidden" id="current-index" value="0" />
+	<div id="questions-wrapper" class="space-y-6">
+		{% for q in questions %}
+			<div class="bg-white border rounded p-4 question-card {% if not loop.first %}hidden{% endif %}" data-index="{{ loop.index0 }}" data-qid="{{ q.id }}" data-qtime="{{ q.time_limit_seconds or 0 }}">
+				<div class="flex items-start justify-between gap-3">
+					<div class="font-semibold">Q{{ loop.index }}. {{ q.text }}</div>
+					<div class="text-xs px-2 py-1 rounded-full border {{ 'bg-amber-50 text-amber-700' if q.time_limit_seconds else 'bg-gray-50 text-gray-600' }}">
+						<span>Time</span>
+						<span class="ml-1 font-mono" id="q-timer-{{ q.id }}">{% if q.time_limit_seconds %}{{ (q.time_limit_seconds // 60)|int }}:{% if (q.time_limit_seconds % 60) < 10 %}0{% endif %}{{ q.time_limit_seconds % 60 }}{% else %}∞{% endif %}</span>
+					</div>
+				</div>
+				<div class="mt-3 space-y-2">
+					{% for o in q.options %}
+						<label class="flex items-center gap-2">
+							<input type="radio" name="question_{{ q.id }}" value="{{ o.id }}" class="h-4 w-4 answer-input" />
+							<span>{{ o.text }}</span>
+						</label>
+					{% endfor %}
+				</div>
+			</div>
+		{% else %}
+			<div class="text-gray-500">No questions defined for this subject yet.</div>
+		{% endfor %}
+	</div>
+	<div class="flex items-center justify-between pt-2">
+		<button type="button" id="prev-btn" class="px-4 py-2 rounded border" disabled>Previous</button>
+		<div class="flex items-center gap-3 text-sm">
+			<div class="text-gray-600">Question <span id="pos">1</span> of {{ questions|length }}</div>
+			<button type="button" id="next-btn" class="bg-brand text-white px-6 py-2 rounded">Next</button>
+			<button type="submit" id="submit-btn" class="hidden bg-brand text-white px-6 py-2 rounded">Submit</button>
+		</div>
+	</div>
+</form>
+<script>
+	document.addEventListener('DOMContentLoaded', function() {
+		// Use server-provided remaining seconds to avoid clock skew
+		let remaining = {{ end_remaining | default(0) }};
+		let subjectExpired = false;
+		function setAllDisabled(disabled) {
+			document.querySelectorAll('.answer-input').forEach(i => i.disabled = disabled);
+			document.getElementById('prev-btn').disabled = true;
+		}
+		function updateSubjectTimer() {
+			if (remaining <= 0) {
+				if (!subjectExpired) {
+					subjectExpired = true;
+					document.getElementById('timeup-banner').classList.remove('hidden');
+					setAllDisabled(true);
+					document.getElementById('next-btn').classList.add('hidden');
+					document.getElementById('submit-btn').classList.remove('hidden');
+				}
+				remaining = 0;
+			} else {
+				remaining -= 1;
+			}
+			const minutes = Math.floor(remaining / 60);
+			const seconds = remaining % 60;
+			document.getElementById('timer').textContent = `${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
+		}
+		updateSubjectTimer();
+		setInterval(updateSubjectTimer, 1000);
+
+		// Per-question strict enforcement without auto-submit on last
+		const cards = Array.from(document.querySelectorAll('.question-card'));
+		const locked = new Set();
+		const remainingPerQ = {};
+		cards.forEach(card => {
+			const qid = card.getAttribute('data-qid');
+			const secs = parseInt(card.getAttribute('data-qtime'), 10) || 0;
+			if (secs > 0) remainingPerQ[qid] = secs;
+		});
+		let idx = 0;
+		let qInterval = null;
+
+		function showIndex(newIdx) {
+			if (newIdx < 0 || newIdx >= cards.length) return;
+			cards.forEach((c,i) => {
+				if (i === newIdx) c.classList.remove('hidden'); else c.classList.add('hidden');
+			});
+			document.getElementById('current-index').value = String(newIdx);
+			document.getElementById('pos').textContent = String(newIdx + 1);
+			document.getElementById('prev-btn').disabled = newIdx === 0;
+			const nextBtn = document.getElementById('next-btn');
+			const submitBtn = document.getElementById('submit-btn');
+			if (newIdx === cards.length - 1) {
+				nextBtn.classList.add('hidden');
+				submitBtn.classList.remove('hidden');
+			} else {
+				nextBtn.classList.remove('hidden');
+				submitBtn.classList.add('hidden');
+			}
+			startPerQuestionTimer(cards[newIdx]);
+		}
+
+		function disableInputs(card) {
+			card.querySelectorAll('input[type="radio"]').forEach(i => i.disabled = true);
+		}
+
+		function startPerQuestionTimer(card) {
+			if (qInterval) clearInterval(qInterval);
+			const qid = card.getAttribute('data-qid');
+			const timeElem = document.getElementById(`q-timer-${qid}`);
+			if (!timeElem) return; // no per-question timer
+			if (locked.has(qid)) {
+				disableInputs(card);
+				return;
+			}
+			if (!(qid in remainingPerQ)) return; // infinity
+			qInterval = setInterval(() => {
+				if (!(qid in remainingPerQ)) return;
+				remainingPerQ[qid] = Math.max(remainingPerQ[qid] - 1, 0);
+				const mins = Math.floor(remainingPerQ[qid] / 60);
+				const secs = remainingPerQ[qid] % 60;
+				timeElem.textContent = `${String(mins)}:${String(secs).padStart(2,'0')}`;
+				if (remainingPerQ[qid] <= 5) {
+					timeElem.parentElement.classList.add('bg-red-50','text-red-700','border-red-200');
+				}
+				if (remainingPerQ[qid] === 0) {
+					locked.add(qid);
+					disableInputs(card);
+					clearInterval(qInterval);
+					if (idx < cards.length - 1) {
+						goNext();
+					}
+				}
+			}, 1000);
+		}
+
+		function goNext() {
+			idx = Math.min(idx + 1, cards.length - 1);
+			showIndex(idx);
+		}
+		function goPrev() {
+			idx = Math.max(idx - 1, 0);
+			showIndex(idx);
+		}
+		document.getElementById('next-btn').addEventListener('click', goNext);
+		document.getElementById('prev-btn').addEventListener('click', goPrev);
+
+		// init explicit
+		showIndex(0);
+	});
+</script>
+{% endblock %}

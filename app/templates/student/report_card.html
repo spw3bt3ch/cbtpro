@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Report Card{% endblock %}
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+	<div>
+		<h1 class="text-2xl font-semibold">Report Card</h1>
+		<p class="text-gray-600">Latest results per subject</p>
+	</div>
+	<a href="{{ url_for('student.report_card_pdf') }}" class="px-4 py-2 rounded bg-brand text-white">Download PDF</a>
+</div>
+<div class="overflow-x-auto bg-white border rounded">
+	<table class="min-w-full text-sm">
+		<thead class="bg-gray-50">
+			<tr>
+				<th class="text-left p-3 border-b">Subject</th>
+				<th class="text-left p-3 border-b">Total</th>
+				<th class="text-left p-3 border-b">Correct</th>
+				<th class="text-left p-3 border-b">Score (%)</th>
+				<th class="text-left p-3 border-b">Grade</th>
+				<th class="text-left p-3 border-b">Date</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for r in rows %}
+				<tr class="border-b">
+					<td class="p-3">{{ r.subject.name }}</td>
+					<td class="p-3">{{ r.total }}</td>
+					<td class="p-3">{{ r.correct }}</td>
+					<td class="p-3">{{ '%.1f' % r.percentage }}</td>
+					<td class="p-3 font-semibold">{{ r.grade }}</td>
+					<td class="p-3">{{ r.session.completed_at.strftime('%Y-%m-%d %H:%M') if r.session.completed_at else '-' }}</td>
+				</tr>
+			{% else %}
+				<tr>
+					<td colspan="6" class="p-4 text-gray-500">No completed sessions yet.</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+		<tfoot>
+			<tr>
+				<td class="p-3 font-semibold">Overall</td>
+				<td class="p-3" colspan="2"></td>
+				<td class="p-3 font-semibold">{{ '%.1f' % overall }}</td>
+				<td class="p-3 font-semibold">{{ overall_grade }}</td>
+				<td class="p-3"></td>
+			</tr>
+		</tfoot>
+	</table>
+</div>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}CBT Subjects{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-semibold mb-4">Available Subjects</h1>
+<div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+	{% for s in subjects %}
+		<a href="{{ url_for('student.start_exam', subject_id=s.id) }}" class="p-4 bg-white border rounded hover:border-brand">
+			<div class="font-semibold">{{ s.name }}</div>
+			<div class="text-sm text-gray-500">{{ s.duration_minutes }} mins • by {{ s.teacher.full_name }}</div>
+		</a>
+	{% else %}
+		<div class="text-gray-500">No subjects yet.</div>
+	{% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% block title %}CBTPro - Smart CBT for Schools{% endblock %}
+{% block content %}
+<div class="relative w-screen left-1/2 right-1/2 -ml-[50vw] -mr-[50vw]">
+	<section class="relative overflow-hidden" style="background-image:url('{{ url_for('static', filename='images/hero.jpg') }}'), url('{{ url_for('static', filename='images/hero.svg') }}'); background-size:cover; background-position:center;">
+		<div class="absolute inset-0 bg-black/70"></div>
+		<div class="relative z-10 px-4 sm:px-8 py-16 md:py-24">
+			<div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-10 items-center text-white">
+				<div class="space-y-7">
+					<div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/20 bg-white/10 backdrop-blur text-xs">
+						<span class="h-2 w-2 rounded-full bg-emerald-400"></span>
+						WAEC/NECO-ready Computer Based Testing
+					</div>
+					<h1 class="text-3xl sm:text-5xl font-extrabold leading-tight tracking-tight">
+						Run <span class="text-brand">world‑class CBTs</span> with ease
+					</h1>
+					<p class="text-white/90 text-base sm:text-lg max-w-prose">
+						Author subjects, set durations, and publish exams in minutes. Students enjoy a distraction‑free interface with automatic timing and instant Nigeria‑style grading.
+					</p>
+					<ul class="grid sm:grid-cols-2 gap-2 text-white/95 text-sm">
+						<li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-brand"></span><span class="text-brand">Teacher self‑service authoring</span></li>
+						<li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-brand"></span><span class="text-brand">Per‑subject timers & auto‑submit</span></li>
+						<li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-brand"></span><span class="text-brand">Clean, mobile‑first UI</span></li>
+						<li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-brand"></span><span class="text-brand">Nigeria grading (A1–F9)</span></li>
+					</ul>
+					<div class="flex flex-wrap gap-3 pt-1">
+						<a href="{{ url_for('auth.register') }}" class="bg-brand hover:bg-brand-dark text-white px-6 py-3 rounded-lg shadow-sm">Create free account</a>
+						<a href="{{ url_for('student.index') }}" class="px-6 py-3 rounded-lg border border-white/30 bg-white/10 backdrop-blur hover:border-white">Explore subjects</a>
+					</div>
+				</div>
+				<div class="hidden md:block">
+					<div class="rounded-xl border border-white/15 bg-white/10 backdrop-blur p-5">
+						<h2 class="font-semibold mb-3">Recent Subjects</h2>
+						<div class="grid grid-cols-1 gap-3">
+							{% for s in subjects %}
+								<a href="{{ url_for('student.start_exam', subject_id=s.id) }}" class="block p-4 rounded-lg bg-white/10 border border-white/15 hover:border-white/40 transition">
+									<div class="font-semibold truncate">{{ s.name }}</div>
+									<div class="text-xs text-white/80">{{ s.duration_minutes }} mins • by {{ s.teacher.full_name }}</div>
+								</a>
+							{% else %}
+								<div class="text-white/80">No subjects yet. Teachers can add from their dashboard.</div>
+							{% endfor %}
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="mt-8">
+				<div class="max-w-6xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-3">
+					<div class="rounded-lg border border-white/15 bg-white/10 backdrop-blur p-3 text-center">
+						<div class="text-xl font-bold text-brand">5 min</div>
+						<div class="text-xs text-white/80">Setup time</div>
+					</div>
+					<div class="rounded-lg border border-white/15 bg-white/10 backdrop-blur p-3 text-center">
+						<div class="text-xl font-bold text-brand">100%</div>
+						<div class="text-xs text-white/80">Mobile ready</div>
+					</div>
+					<div class="rounded-lg border border-white/15 bg-white/10 backdrop-blur p-3 text-center">
+						<div class="text-xl font-bold text-brand">A1–F9</div>
+						<div class="text-xs text-white/80">Nigeria grading</div>
+					</div>
+					<div class="rounded-lg border border-white/15 bg-white/10 backdrop-blur p-3 text-center">
+						<div class="text-xl font-bold text-brand">Secure</div>
+						<div class="text-xs text-white/80">Auto submit</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+</div>
+
+<section class="mt-12 bg-gradient-to-br from-white via-sky-50 to-white rounded-2xl border p-6 sm:p-8">
+	<div class="grid md:grid-cols-3 gap-6">
+		<div class="p-6 rounded-xl bg-white border shadow-sm hover:shadow-md transition">
+			<div class="h-10 w-10 rounded-lg bg-brand/15 text-brand flex items-center justify-center font-bold">1</div>
+			<h3 class="mt-4 font-semibold text-lg text-brand">Author with control</h3>
+			<p class="text-gray-700">Teachers create subjects, add questions and options, and set exam duration.</p>
+		</div>
+		<div class="p-6 rounded-xl bg-white border shadow-sm hover:shadow-md transition">
+			<div class="h-10 w-10 rounded-lg bg-brand/15 text-brand flex items-center justify-center font-bold">2</div>
+			<h3 class="mt-4 font-semibold text-lg text-brand">Seamless testing</h3>
+			<p class="text-gray-700">Students take CBTs with a live countdown and auto‑submit on timeout.</p>
+		</div>
+		<div class="p-6 rounded-xl bg-white border shadow-sm hover:shadow-md transition">
+			<div class="h-10 w-10 rounded-lg bg-brand/15 text-brand flex items-center justify-center font-bold">3</div>
+			<h3 class="mt-4 font-semibold text-lg text-brand">Nigeria‑style reports</h3>
+			<p class="text-gray-700">Performance summarized with WAEC/NECO grade mapping for instant insights.</p>
+		</div>
+	</div>
+</section>
+
+<section class="mt-12 grid md:grid-cols-2 gap-6">
+	<div class="p-6 rounded-2xl border bg-white shadow-sm">
+		<h3 class="font-semibold text-lg mb-3 text-brand">Why schools choose CBTPro</h3>
+		<ul class="space-y-3 text-gray-700">
+			<li class="flex gap-3"><span class="mt-1 h-2 w-2 rounded-full bg-brand"></span><span>Lightning‑fast setup and simple authoring</span></li>
+			<li class="flex gap-3"><span class="mt-1 h-2 w-2 rounded-full bg-brand"></span><span>Clean, distraction‑free test interface</span></li>
+			<li class="flex gap-3"><span class="mt-1 h-2 w-2 rounded-full bg-brand"></span><span>Mobile‑first design for all devices</span></li>
+			<li class="flex gap-3"><span class="mt-1 h-2 w-2 rounded-full bg-brand"></span><span>Exportable results and transparent grading</span></li>
+		</ul>
+	</div>
+	<div class="p-6 rounded-2xl border bg-white shadow-sm">
+		<h3 class="font-semibold text-lg mb-3 text-brand">What users say</h3>
+		<div class="space-y-4">
+			<blockquote class="rounded-lg border border-brand/20 bg-sky-50/50 p-4 text-gray-700">
+				“Setting questions and timing is effortless. Our students love the experience.”
+				<div class="text-sm text-gray-500 mt-1">— Mrs. Ade, Teacher</div>
+			</blockquote>
+			<blockquote class="rounded-lg border border-brand/20 bg-sky-50/50 p-4 text-gray-700">
+				“I could take my tests on my phone with no issues. Very smooth.”
+				<div class="text-sm text-gray-500 mt-1">— Chinedu, Student</div>
+			</blockquote>
+		</div>
+	</div>
+</section>
+
+<section class="mt-12 text-center border rounded-2xl p-8 bg-gradient-to-br from-sky-50 to-white">
+	<h3 class="text-xl sm:text-2xl font-bold text-brand">Ready to run your next CBT?</h3>
+	<p class="text-gray-700 mt-2">Start free. No complicated setup required.</p>
+	<div class="mt-4 flex flex-wrap items-center justify-center gap-3">
+		<a href="{{ url_for('auth.register') }}" class="bg-brand hover:bg-brand-dark text-white px-6 py-3 rounded-lg shadow-sm">Create a free account</a>
+		<a href="{{ url_for('student.index') }}" class="px-6 py-3 rounded-lg border hover:border-brand">View subjects</a>
+	</div>
+</section>
+{% endblock %}

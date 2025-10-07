@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}New Question{% endblock %}
+{% block content %}
+<div class="max-w-lg bg-white p-6 rounded border">
+	<h1 class="text-2xl font-semibold mb-4">{{ 'Edit' if form.text.data else 'Add' }} Question</h1>
+	<form method="post">
+		{{ form.hidden_tag() }}
+		<div class="space-y-4">
+			<div>
+				<label class="block text-sm mb-1">Question</label>
+				{{ form.text(class_='w-full border rounded px-3 py-2') }}
+			</div>
+			<div>
+				<label class="block text-sm mb-1">Per-question time (seconds)</label>
+				{{ form.time_limit_seconds(class_='w-full border rounded px-3 py-2') }}
+				<p class="text-xs text-gray-500 mt-1">Optional. Leave blank to use the subject total duration only.</p>
+			</div>
+			<button class="bg-brand text-white px-4 py-2 rounded">Save</button>
+		</div>
+	</form>
+</div>
+{% endblock %}

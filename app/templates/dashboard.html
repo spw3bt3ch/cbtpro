@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="rounded-xl border bg-gradient-to-br from-white to-gray-50 p-6 mb-6">
+	<div class="flex items-start justify-between gap-4">
+		<div>
+			<h2 class="text-2xl font-semibold">Welcome, {{ user.full_name }}</h2>
+			<p class="text-gray-600">Role: <span class="font-medium capitalize">{{ user.role }}</span></p>
+		</div>
+		{% if user.is_teacher() %}
+			<a href="{{ url_for('teacher.create_subject') }}" class="px-4 py-2 rounded bg-brand text-white shadow-sm">New Subject</a>
+		{% endif %}
+	</div>
+</div>
+
+<div class="grid md:grid-cols-2 gap-6">
+	<div class="p-6 bg-white rounded-xl border">
+		<h3 class="font-semibold mb-3">Quick Actions</h3>
+		<div class="grid grid-cols-2 gap-3">
+			{% if user.is_teacher() %}
+				<a href="{{ url_for('teacher.index') }}" class="p-3 rounded border hover:border-brand">Teacher Panel</a>
+				<a href="{{ url_for('teacher.create_subject') }}" class="p-3 rounded border hover:border-brand">Create Subject</a>
+				<a href="{{ url_for('student.index') }}" class="p-3 rounded border hover:border-brand">Preview CBT</a>
+				<a href="{{ url_for('main.home') }}" class="p-3 rounded border hover:border-brand">Homepage</a>
+			{% else %}
+				<a href="{{ url_for('student.index') }}" class="p-3 rounded border hover:border-brand">Available Subjects</a>
+				<a href="{{ url_for('student.report_card') }}" class="p-3 rounded border hover:border-brand">Report Card</a>
+				<a href="{{ url_for('main.home') }}" class="p-3 rounded border hover:border-brand">Homepage</a>
+			{% endif %}
+		</div>
+	</div>
+	<div class="p-6 bg-white rounded-xl border">
+		<h3 class="font-semibold mb-3">Tips</h3>
+		<ul class="space-y-2 text-gray-700 text-sm">
+			{% if user.is_teacher() %}
+				<li class="flex gap-2"><span class="mt-1 h-1.5 w-1.5 rounded-full bg-emerald-500"></span>Use the teacher panel to add questions and mark the correct option.</li>
+				<li class="flex gap-2"><span class="mt-1 h-1.5 w-1.5 rounded-full bg-emerald-500"></span>Set the subject duration to control total test time.</li>
+				<li class="flex gap-2"><span class="mt-1 h-1.5 w-1.5 rounded-full bg-emerald-500"></span>Optionally set per-question time for stricter pacing.</li>
+			{% else %}
+				<li class="flex gap-2"><span class="mt-1 h-1.5 w-1.5 rounded-full bg-emerald-500"></span>Select a subject and answer all questions before time runs out.</li>
+				<li class="flex gap-2"><span class="mt-1 h-1.5 w-1.5 rounded-full bg-emerald-500"></span>Watch the top timer; your test auto-submits at 0.</li>
+				<li class="flex gap-2"><span class="mt-1 h-1.5 w-1.5 rounded-full bg-emerald-500"></span>Review your report after submission to see correct answers.</li>
+			{% endif %}
+		</ul>
+	</div>
+</div>
+{% endblock %}

@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block title %}Forbidden{% endblock %}
+{% block content %}
+<div class="max-w-lg mx-auto bg-white border rounded p-6 text-center">
+	<h1 class="text-3xl font-semibold mb-2">403</h1>
+	<p class="text-gray-600 mb-4">You do not have permission to access this resource.</p>
+	<a class="text-brand" href="{{ url_for('main.home') }}">Go Home</a>
+</div>
+{% endblock %}
