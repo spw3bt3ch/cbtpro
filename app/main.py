@@ -9,7 +9,7 @@ main_bp = Blueprint("main", __name__)
 
 @main_bp.route("/")
 def home():
-    subjects = Subject.query.order_by(Subject.created_at.desc()).limit(6).all()
+    subjects = Subject.query.order_by(Subject.created_at.desc()).limit(4).all()
     return render_template("home.html", subjects=subjects)
 
 
